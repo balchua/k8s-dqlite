@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"os"
+	"log"
 	"time"
 
 	"github.com/k3s-io/kine/pkg/drivers/generic"
