@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/url"
 	"os"
 	"strconv"
@@ -74,6 +75,7 @@ outer:
 }
 
 func New(ctx context.Context, datasourceName string, tlsInfo tls.Config, connPoolConfig generic.ConnectionPoolConfig) (server.Backend, error) {
+	log.Printf("In New dqlite")
 	opts, err := parseOpts(datasourceName)
 	if err != nil {
 		return nil, err
@@ -89,6 +91,7 @@ func New(ctx context.Context, datasourceName string, tlsInfo tls.Config, connPoo
 		nodeStore = client.NewInmemNodeStore()
 	}
 
+	log.Printf("About to AddPeer")
 	if err := AddPeers(ctx, nodeStore, opts.peers...); err != nil {
 		return nil, errors.Wrap(err, "add peers")
 	}
@@ -109,13 +112,16 @@ func New(ctx context.Context, datasourceName string, tlsInfo tls.Config, connPoo
 		sql.Register(opts.driverName, d)
 	}
 
+	log.Printf("About to NewVariant")
 	backend, generic, err := sqlite.NewVariant(ctx, opts.driverName, opts.dsn, connPoolConfig)
+	log.Printf("Done with NewVariant")
 	if err != nil {
 		return nil, errors.Wrap(err, "sqlite client")
 	}
 	if err := migrate(ctx, generic.DB); err != nil {
 		return nil, errors.Wrap(err, "failed to migrate DB from sqlite")
 	}
+	log.Printf("Done with migrate")
 
 	generic.LockWrites = true
 	generic.Retry = func(err error) bool {
@@ -131,6 +137,7 @@ func New(ctx context.Context, datasourceName string, tlsInfo tls.Config, connPoo
 		return err
 	}
 
+	log.Printf("Return from New")
 	return backend, nil
 }
 

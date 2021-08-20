@@ -130,6 +130,8 @@ func getKineStorageBackend(ctx context.Context, driver, dsn string, cfg Config) 
 		leaderElect = true
 		err         error
 	)
+	log.Printf("In getKineStorageBackend")
+	log.Printf("driver is %s", driver)
 	switch driver {
 	case SQLiteBackend:
 		leaderElect = false
