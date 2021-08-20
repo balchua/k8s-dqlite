@@ -48,6 +48,7 @@ func New(ctx context.Context, dataSourceName string, connPoolConfig generic.Conn
 }
 
 func NewVariant(ctx context.Context, driverName, dataSourceName string, connPoolConfig generic.ConnectionPoolConfig) (server.Backend, *generic.Generic, error) {
+	log.Printf("Inside NewVariant")
 	if dataSourceName == "" {
 		if err := os.MkdirAll("./db", 0700); err != nil {
 			return nil, nil, err
@@ -55,10 +56,12 @@ func NewVariant(ctx context.Context, driverName, dataSourceName string, connPool
 		dataSourceName = "./db/state.db?_journal=WAL&cache=shared"
 	}
 
+	log.Printf("About to call open")
 	dialect, err := generic.Open(ctx, driverName, dataSourceName, connPoolConfig, "?", false)
 	if err != nil {
 		return nil, nil, err
 	}
+	log.Printf("Done open")
 
 	dialect.LastInsertID = true
 	dialect.CompactSQL = `
@@ -88,7 +91,9 @@ func NewVariant(ctx context.Context, driverName, dataSourceName string, connPool
 	// this is the first SQL that will be executed on a new DB conn so
 	// loop on failure here because in the case of dqlite it could still be initializing
 	for i := 0; i < 300; i++ {
+		log.Printf("About to call setup")
 		err = setup(dialect.DB)
+		log.Printf("Done with setup")
 		if err == nil {
 			break
 		}
@@ -104,7 +109,9 @@ func NewVariant(ctx context.Context, driverName, dataSourceName string, connPool
 		return nil, nil, errors.Wrap(err, "setup db")
 	}
 
+	log.Printf("About to call Migrate")
 	dialect.Migrate(context.Background())
+	log.Printf("About to call logstructured.New")
 	return logstructured.New(sqllog.New(dialect)), dialect, nil
 }
 
