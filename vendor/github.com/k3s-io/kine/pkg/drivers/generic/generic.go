@@ -157,11 +157,15 @@ func openAndTest(driverName, dataSourceName string) (*sql.DB, error) {
 	}
 
 	for i := 0; i < 3; i++ {
+		logrus.Printf("About to ping the DB")
 		if err := db.Ping(); err != nil {
+			logrus.Printf("About to close the DB")
 			db.Close()
+			logrus.Printf("About retunr")
 			return nil, err
 		}
 	}
+	logrus.Printf("About to return after 3 pings")
 
 	return db, nil
 }
