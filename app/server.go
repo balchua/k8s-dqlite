@@ -50,6 +50,7 @@ var dqliteCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to start server: %s\n", err)
 		}
+		log.Println("New sever created")
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 
 		ch := make(chan os.Signal)
@@ -57,7 +58,9 @@ var dqliteCmd = &cobra.Command{
 		signal.Notify(ch, unix.SIGINT)
 		signal.Notify(ch, unix.SIGQUIT)
 		signal.Notify(ch, unix.SIGTERM)
+		log.Println("Waiting for termination")
 		<-ch
+		log.Println("Got termination signal")
 
 		log.Printf("Shutting down\n")
 		cancel()
