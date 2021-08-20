@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/k3s-io/kine/pkg/drivers/generic"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -39,7 +38,6 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 	// listen: kine listen endpoint could be a socket ("unix://<path>")
 	//         or network ep ("tcp://127.0.0.1:12345")
 	// enableTls: true if we should enable tls communication
-	log.Printf("Inside New server")
 	cfg, err := config.Load(dir)
 	if err != nil {
 		return nil, err
@@ -91,9 +89,7 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 		options = append(options, app.WithAddress(cfg.Init.Address), app.WithCluster(cfg.Init.Cluster))
 	}
 
-	log.Printf("New app")
 	app, err := app.New(dir, options...)
-	log.Printf("New app returned")
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +102,9 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Minute)
 	defer cancel()
 
-	log.Printf("New app ready?")
 	if err := app.Ready(ctx); err != nil {
 		return nil, err
 	}
-	log.Printf("New app ready? Yes")
 
 	// Connect to a single peer that is the current machine
 	info := client.NodeInfo{}
@@ -162,13 +156,9 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 	}
 
 	kineCtx, cancelKine := context.WithCancel(context.Background())
-	log.Printf("Kine endpoint listen")
-	log.Printf("Kine endpoint listen ep: %s listener: %s, key %s cert %s, ca %s", config.Endpoint, config.Listener, config.Config.KeyFile, config.Config.CertFile, config.Config.CAFile)
-
 	if _, err := endpoint.Listen(kineCtx, config); err != nil {
 		return nil, errors.Wrap(err, "kine")
 	}
-	log.Printf("Kine endpoint listen done")
 
 	s := &Server{
 		dir:        dir,

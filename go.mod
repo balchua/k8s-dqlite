@@ -7,8 +7,8 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.6.0
-	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738
+	github.com/stretchr/testify v1.6.0 // indirect
+	go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738 // indirect
 	go.uber.org/zap v1.15.0 // indirect
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
 	golang.org/x/sys v0.0.0-20200622214017-ed371f2e16b4
