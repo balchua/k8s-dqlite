@@ -163,6 +163,8 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 
 	kineCtx, cancelKine := context.WithCancel(context.Background())
 	log.Printf("Kine endpoint listen")
+	log.Printf("Kine endpoint listen ep: %s listener: %s, key %s cert %s, ca %s", config.Endpoint, config.Listener, config.Config.KeyFile, config.Config.CertFile, config.Config.CAFile)
+
 	if _, err := endpoint.Listen(kineCtx, config); err != nil {
 		return nil, errors.Wrap(err, "kine")
 	}
