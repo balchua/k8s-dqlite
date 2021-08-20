@@ -3,6 +3,7 @@ package endpoint
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -44,6 +45,7 @@ type ETCDConfig struct {
 }
 
 func Listen(ctx context.Context, config Config) (ETCDConfig, error) {
+	log.Printf("Inside listen")
 	driver, dsn := ParseStorageEndpoint(config.Endpoint)
 	if driver == ETCDBackend {
 		return ETCDConfig{
@@ -53,11 +55,13 @@ func Listen(ctx context.Context, config Config) (ETCDConfig, error) {
 		}, nil
 	}
 
+	log.Printf("About to call getKineStorageBackend")
 	leaderelect, backend, err := getKineStorageBackend(ctx, driver, dsn, config)
 	if err != nil {
 		return ETCDConfig{}, errors.Wrap(err, "building kine")
 	}
 
+	log.Printf("About to start backend")
 	if err := backend.Start(ctx); err != nil {
 		return ETCDConfig{}, errors.Wrap(err, "starting kine backend")
 	}
@@ -67,10 +71,12 @@ func Listen(ctx context.Context, config Config) (ETCDConfig, error) {
 		listen = KineSocket
 	}
 
+	log.Printf("About to server.New")
 	b := server.New(backend)
 	grpcServer := grpcServer(config)
 	b.Register(grpcServer)
 
+	log.Printf("About to create listener")
 	listener, err := createListener(listen)
 	if err != nil {
 		return ETCDConfig{}, err
@@ -85,6 +91,7 @@ func Listen(ctx context.Context, config Config) (ETCDConfig, error) {
 		listener.Close()
 	}()
 
+	log.Printf("About to return")
 	return ETCDConfig{
 		LeaderElect: leaderelect,
 		Endpoints:   []string{listen},
