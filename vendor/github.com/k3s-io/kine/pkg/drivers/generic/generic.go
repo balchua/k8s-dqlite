@@ -149,7 +149,9 @@ func configureConnectionPooling(connPoolConfig ConnectionPoolConfig, db *sql.DB,
 }
 
 func openAndTest(driverName, dataSourceName string) (*sql.DB, error) {
+	logrus.Printf("Inside openAndTest")
 	db, err := sql.Open(driverName, dataSourceName)
+	logrus.Printf("Done with open")
 	if err != nil {
 		return nil, err
 	}
@@ -165,18 +167,20 @@ func openAndTest(driverName, dataSourceName string) (*sql.DB, error) {
 }
 
 func Open(ctx context.Context, driverName, dataSourceName string, connPoolConfig ConnectionPoolConfig, paramCharacter string, numbered bool) (*Generic, error) {
+	logrus.Printf("Inside Open")
 	var (
 		db  *sql.DB
 		err error
 	)
 
 	for i := 0; i < 300; i++ {
+		logrus.Printf("About to call open and test")
 		db, err = openAndTest(driverName, dataSourceName)
 		if err == nil {
 			break
 		}
 
-		logrus.Errorf("failed to ping connection: %v", err)
+		logrus.Printf("failed to ping connection: %v", err)
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
@@ -184,7 +188,9 @@ func Open(ctx context.Context, driverName, dataSourceName string, connPoolConfig
 		}
 	}
 
+	logrus.Printf("About to configure cnnection pool")
 	configureConnectionPooling(connPoolConfig, db, driverName)
+	logrus.Printf("Done configure cnnection pool")
 
 	return &Generic{
 		DB: db,
