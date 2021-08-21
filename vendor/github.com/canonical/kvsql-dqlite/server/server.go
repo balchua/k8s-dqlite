@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/k3s-io/kine/pkg/drivers/generic"
+	//"github.com/rancher/kine/pkg/drivers/generic"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,8 +14,8 @@ import (
 	"github.com/canonical/go-dqlite/client"
 	"github.com/canonical/kvsql-dqlite/server/config"
 	"github.com/ghodss/yaml"
-	"github.com/k3s-io/kine/pkg/endpoint"
-	"github.com/k3s-io/kine/pkg/tls"
+	"github.com/rancher/kine/pkg/endpoint"
+	"github.com/rancher/kine/pkg/tls"
 	"github.com/pkg/errors"
 )
 
@@ -134,15 +134,15 @@ func New(dir string, listen string, enableTls bool) (*Server, error) {
 		ep = listen
 	}
 
-	pool := generic.ConnectionPoolConfig{
-		MaxIdle:     5,
-		MaxOpen:     5,
-		MaxLifetime: 60 * time.Second,
-	}
+	//pool := generic.ConnectionPoolConfig{
+	//	MaxIdle:     5,
+	//	MaxOpen:     5,
+	//	MaxLifetime: 60 * time.Second,
+	//}
 	config := endpoint.Config{
 		Listener:             ep,
 		Endpoint:             fmt.Sprintf("dqlite://k8s?peer-file=%s&driver-name=%s", peers, app.Driver()),
-		ConnectionPoolConfig: pool,
+	//	ConnectionPoolConfig: pool,
 	}
 
 	if enableTls {
